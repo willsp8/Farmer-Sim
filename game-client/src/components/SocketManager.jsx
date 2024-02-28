@@ -6,6 +6,8 @@ import { atom, useAtom } from 'jotai'
 var stompClient = null
 
 export const charactersAtom = atom([])
+Math.floor(Math.random() * 50)
+    localStorage.setItem('fun',  Math.floor(Math.random() * 50) + "AB")
 
 export const SocketManager = () => {
     const [_characters, setCharacters] = useAtom(charactersAtom)
@@ -28,13 +30,23 @@ export const SocketManager = () => {
             });
 
             stompClient.subscribe('/move/player', (greeting) => {
-                console.log("Bob bob bob me ")
-                console.log(JSON.parse(greeting.body))
+              console.log("Bob bob bob me ")
+              console.log(JSON.parse(greeting.body))
 
-                // we do this later with the for loop 
-                setCharacters(JSON.parse(greeting.body))
-                //showGreeting(JSON.parse(greeting.body).content);
+              // we do this later with the for loop 
+              setCharacters(JSON.parse(greeting.body))
+              //showGreeting(JSON.parse(greeting.body).content);
             });
+            
+
+            // stompClient.subscribe('/move/player', (greeting) => {
+            //     console.log("Bob bob bob me ")
+            //     console.log(JSON.parse(greeting.body))
+
+            //     // we do this later with the for loop 
+            //     setCharacters(JSON.parse(greeting.body))
+            //     //showGreeting(JSON.parse(greeting.body).content);
+            // });
 
         userJoin()
       }
@@ -44,7 +56,7 @@ export const SocketManager = () => {
       const userJoin=()=>{
             
         // once we subscribe to this topic we can then gather the data from our user 
-        stompClient.send('/app/hello',{});
+        stompClient.send('/app/hello',{}, JSON.stringify(localStorage.getItem('fun')));
         
         
             

@@ -7,19 +7,41 @@ import { MeshStandardMaterial } from "three";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three"
 
+
+// this fixed my charcters not rendering error 
+// https://stackoverflow.com/questions/64941910/react-map-not-rendering-array-but-console-logs
 var stompClient = null
 export const Experience = () => {
 
     const [characters] = useAtom(charactersAtom)
     const [onFloor, setOnFloor] = useState(false)
     const [user, setUser] = useState()
+    const [characters2, setCharacters2] = useState(false)
     useCursor(onFloor)
 
     const movePlayer = (e) => {
         setUser(characters)
-        characters.newPosition = [e.point.x,0,e.point.z]
-        console.log(JSON.stringify(user))
-        stompClient.send('/app/move',{},JSON.stringify(characters));
+
+        var char = null;
+        //characters.newPosition = [e.point.x,0,e.point.z]
+        characters.forEach((time) => {
+         
+           console.log(JSON.parse(time.id))
+
+           const id = localStorage.getItem('fun') + ""
+            if(JSON.parse(time.id) == id){
+                char = time 
+                console.log(char)
+            }
+           
+        })
+        
+        console.log(char)
+        
+        console.log(localStorage.getItem('fun'))
+        char.newPosition = [e.point.x,0,e.point.z]
+        console.log(char)
+        stompClient.send('/app/move',{},JSON.stringify(char));
         // stompClient.send('/app/hello',{});
     
 
@@ -36,10 +58,10 @@ export const Experience = () => {
         
         console.log("bob")
 
-        stompClient.subscribe('/move/player', (greeting) => {
-            console.log("adlakjsdlakjsdjkakjds")
-            //showGreeting(JSON.parse(greeting.body).content);
-        });
+        // stompClient.subscribe('/move/player', (greeting) => {
+        //     console.log("adlakjsdlakjsdjkakjds")
+        //     //showGreeting(JSON.parse(greeting.body).content);
+        // });
 
       
       }
@@ -50,10 +72,7 @@ export const Experience = () => {
             
         // once we subscribe to this topic we can then gather the data from our user 
         stompClient.send('/app/hello',{});
-    
-            
-            
-            
+        
       }
 
     
@@ -64,16 +83,10 @@ export const Experience = () => {
     console.log(characters)
     useEffect(() => {
         stompClient = Stomp.client("ws://localhost:8080/ws");
-          // Stomp.connect
-          // stompClient = Stomp.over(socket);
-    
+
         stompClient.connect({}, onConnected, onError);
-          
-        console.log(characters.position[0])
-        
-        // characters.map((character) => {
-        //     console.log(character)
-        // })
+
+        console.log(characters2)
         
     }, [])
     return (
@@ -89,12 +102,15 @@ export const Experience = () => {
                 <planeGeometry args={[10, 10]}></planeGeometry>
                 <meshStandardMaterial color="#f0f0f0"></meshStandardMaterial>
             </mesh>
-            {
-                <AnimatedWoman key={characters.id} 
-                position={new THREE.Vector3(characters.position[0], characters.position[1], characters.position[2] )}
-                hairColor={characters.hairColor} 
-                bottomColor={characters.bottomColor} 
-                topColor={characters.topColor}></AnimatedWoman>
+            {characters.map((character, index) => {
+                return(
+                <AnimatedWoman key={index} 
+                position={new THREE.Vector3(character.position[0], character.position[1], character.position[2] )}
+                hairColor={character.hairColor} 
+                bottomColor={character.bottomColor} 
+                topColor={character.topColor}></AnimatedWoman>)
+            })
+                
             }
 
 
